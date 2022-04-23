@@ -154,7 +154,7 @@ public class LIMEService extends InputMethodService implements
     private boolean hasSymbolMapping = false;
     private boolean hasQuickSwitch = false;
 
-    // Hard Keyboad Shift + Space Status
+    // Hard Keyboard Shift + Space Status
     private boolean hasShiftPress = false;
     private boolean onlyShiftPress = false;  //Jeremy '15,5,30 shift only to switch between chi/eng
 
@@ -359,7 +359,7 @@ public class LIMEService extends InputMethodService implements
         candidateViewContainer.initViews();
         mCandidateViewContainer = candidateViewContainer;
 
-        mCandidateViewStandAlone = (CandidateView) mCandidateViewContainer.findViewById(R.id.candidates);
+        mCandidateViewStandAlone = mCandidateViewContainer.findViewById(R.id.candidates);
         mCandidateViewStandAlone.setService(this);
 
 
@@ -514,7 +514,7 @@ public class LIMEService extends InputMethodService implements
         super.onComputeInsets(outInsets);
         if(mCandidateView == null || mCandidateView == mCandidateViewInInputView ) return;
 
-       // Jeremy '16,7,21 get space for candidate view for candidateView typing with physical keybaord
+       // Jeremy '16,7,21 get space for candidate view for candidateView typing with physical keyboard
         outInsets.contentTopInsets = mCandidateViewContainer.getHeight() - mCandidateViewStandAlone.getHeight();
         outInsets.visibleTopInsets = mCandidateViewContainer.getHeight();
 
@@ -847,7 +847,7 @@ public class LIMEService extends InputMethodService implements
 
         // If user use the physical keyboard then not fixed the candidate view also use the tranparent background
         mFixedCandidateViewOn = false;
-        mCandidateView.setTransparentCandidateView(false);
+        if(mCandidateView!=null) mCandidateView.setTransparentCandidateView(false);
 
         //hide softkeyboard. Jeremy '12,5,8
         //Should not hide inputView or the candidateView cannot be shown in first stroke. Jeremy '15,6,1
@@ -929,7 +929,7 @@ public class LIMEService extends InputMethodService implements
      * resume them or let them continue to the app.
      */
     @Override
-    public boolean onKeyDown(int keyCode, @NonNull KeyEvent event) {
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
         // Clean code by jeremy '11,8,22
         if (DEBUG)
             Log.i(TAG, "OnKeyDown():keyCode:" + keyCode
@@ -1246,7 +1246,7 @@ public class LIMEService extends InputMethodService implements
      * the app.
      */
     @Override
-    public boolean onKeyUp(int keyCode, @NonNull KeyEvent event) {
+    public boolean onKeyUp(int keyCode, KeyEvent event) {
         if (DEBUG)
             Log.i(TAG, "OnKeyUp():keyCode:" + keyCode
                             + ", mComposing = " + mComposing
@@ -2680,7 +2680,7 @@ public class LIMEService extends InputMethodService implements
 
             if ((!mFixedCandidateViewOn || hasPhysicalKeyPressed)
                     && mCandidateView != mCandidateViewStandAlone) {
-                mCandidateViewInInputView.clear();
+                if(mCandidateViewInInputView != null) mCandidateViewInInputView.clear();
                 mCandidateView = mCandidateViewStandAlone; //Jeremy '12,5,4 use standalone candidateView for physical keyboard (no soft keyboard shown)
                 //forceHideCandidateView(); //Jeremy '16,7,19 caused the first composing character missing typed with physical keyboard.
                 if (hasPhysicalKeyPressed) {
@@ -2694,7 +2694,7 @@ public class LIMEService extends InputMethodService implements
                         mComposing.delete(0, mComposing.length()-1);
                     updateCandidates();
                 }
-            } else if((mFixedCandidateViewOn || !hasPhysicalKeyPressed ) &&
+            } else if(mFixedCandidateViewOn &&//|| !hasPhysicalKeyPressed ) &&
                     mCandidateView != mCandidateViewInInputView) {
                 mCandidateViewStandAlone.clear();
                 hideCandidateView();
@@ -2951,12 +2951,12 @@ public class LIMEService extends InputMethodService implements
 
                 mCandidateInInputView = (CandidateInInputViewContainer) LayoutInflater.from(mThemeContext).inflate(
                         R.layout.inputcandidate, null);
-                mInputView = (LIMEKeyboardView) mCandidateInInputView.findViewById(R.id.keyboard);
+                mInputView = mCandidateInInputView.findViewById(R.id.keyboard);
                 mInputView.setOnKeyboardActionListener(this);
                 hasDistinctMultitouch = mInputView.hasDistinctMultitouch();
                 mInputView.setHardwareAcceleratedDrawingEnabled(mIsHardwareAcceleratedDrawingEnabled);
                 mCandidateInInputView.initViews();
-                mCandidateViewInInputView = (CandidateView) mCandidateInInputView.findViewById(R.id.candidatesView);
+                mCandidateViewInInputView = mCandidateInInputView.findViewById(R.id.candidatesView);
                 mCandidateViewInInputView.setService(this);
 
             }
@@ -3270,7 +3270,7 @@ public class LIMEService extends InputMethodService implements
 			 */
             if (DEBUG)
                 Log.i(TAG, "handleCharacter() english only mode without prediction, committext = "
-                        + String.valueOf((char) primaryCode));
+                        + (char) primaryCode);
             if (isInputViewShown()) {
                 if (mInputView.isShifted()) {
                     primaryCode = Character.toUpperCase(primaryCode);

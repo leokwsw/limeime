@@ -43,7 +43,6 @@ import android.graphics.Paint;
 import android.graphics.Paint.Align;
 import android.graphics.PorterDuff;
 import android.graphics.Rect;
-import android.graphics.Region.Op;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
 import android.os.Handler;
@@ -1639,7 +1638,7 @@ public class LIMEKeyboardBaseView extends View implements PointerTracker.UIProxy
 
 
     @Override
-    public boolean onTouchEvent(@NonNull MotionEvent me) {
+    public boolean onTouchEvent( MotionEvent me) {
         if(DEBUG)
             Log.i(TAG,"onTouchEvent()");
         final int action = (isAPIpre8) ? me.getAction() : me.getActionMasked();
