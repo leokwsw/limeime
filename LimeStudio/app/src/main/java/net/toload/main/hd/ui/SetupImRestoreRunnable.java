@@ -199,23 +199,23 @@ public class SetupImRestoreRunnable implements Runnable {
         return new Drive.Builder(AndroidHttp.newCompatibleTransport(), new GsonFactory(), credential).build();
     }*/
 
-    private static InputStream downloadFile(Drive service, com.google.api.services.drive.model.File file) {
-        if (file.getDownloadUrl() != null && file.getDownloadUrl().length() > 0) {
-            try {
-                HttpResponse resp =
-                        service.getRequestFactory().buildGetRequest(new GenericUrl(file.getDownloadUrl()))
-                                .execute();
-                return resp.getContent();
-            } catch (IOException e) {
-                // An error occurred.
-                e.printStackTrace();
-                return null;
-            }
-        } else {
-            // The file doesn't have any content stored on Drive.
-            return null;
-        }
-    }
+//    private static InputStream downloadFile(Drive service, com.google.api.services.drive.model.File file) {
+//        if (file.getDownloadUrl() != null && file.getDownloadUrl().length() > 0) {
+//            try {
+//                HttpResponse resp =
+//                        service.getRequestFactory().buildGetRequest(new GenericUrl(file.getDownloadUrl()))
+//                                .execute();
+//                return resp.getContent();
+//            } catch (IOException e) {
+//                // An error occurred.
+//                e.printStackTrace();
+//                return null;
+//            }
+//        } else {
+//            // The file doesn't have any content stored on Drive.
+//            return null;
+//        }
+//    }
 
     private class restoreFromDropbox extends AsyncTask<Void, Long, Boolean> {
 

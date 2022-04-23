@@ -63,6 +63,12 @@
             android:title="@string/enable_emoji_position" />
 
         <CheckBoxPreference
+            android:defaultValue="true"
+            android:key="emoji_button"
+            android:summary="Emoji Button Summary"
+            android:title="Emoji Button"/>
+
+        <CheckBoxPreference
             android:defaultValue="false"
             android:key="persistent_language_mode"
             android:summary="@string/persistent_language_mode_summary"

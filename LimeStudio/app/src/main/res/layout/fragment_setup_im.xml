@@ -506,12 +506,14 @@
             android:layout_marginBottom="5dp" />
 
         <TextView
+          android:visibility="gone"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textAppearance="?android:attr/textAppearanceLarge"
             android:text="@string/setup_im_download_old"
             android:id="@+id/textView55" />
         <TextView
+          android:visibility="gone"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textAppearance="?android:attr/textAppearanceMedium"
@@ -520,6 +522,7 @@
             android:layout_marginBottom="5dp" />
 
         <TableLayout
+          android:visibility="gone"
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
@@ -554,6 +557,7 @@
 
     <com.google.android.gms.ads.AdView
         android:id="@+id/adView"
+      android:visibility="gone"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
