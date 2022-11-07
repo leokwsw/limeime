@@ -52,10 +52,6 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.dropbox.client2.DropboxAPI;
-import com.dropbox.client2.android.AndroidAuthSession;
-import com.dropbox.client2.session.AppKeyPair;
-
 import net.toload.main.hd.DBServer;
 import net.toload.main.hd.Lime;
 import net.toload.main.hd.R;
@@ -105,10 +101,6 @@ public class SetupImFragment extends Fragment {
     /*private GoogleAccountCredential credential;
     static final int REQUEST_ACCOUNT_PICKER_BACKUP = 1;
     static final int REQUEST_ACCOUNT_PICKER_RESTORE = 2;*/
-
-    // Dropbox
-    DropboxAPI<AndroidAuthSession> mdbapi;
-    String dropboxAccessToken;
 
     //Activate LIME IM
 
@@ -201,28 +193,6 @@ public class SetupImFragment extends Fragment {
     public void onResume() {
 
         super.onResume();
-
-        boolean dropboxrequest = mLIMEPref.getParameterBoolean(Lime.DROPBOX_REQUEST_FLAG, false);
-
-        if (dropboxrequest && mdbapi != null && mdbapi.getSession().authenticationSuccessful()) {
-            try {
-                // Required to complete auth, sets the access token on the session
-                mdbapi.getSession().finishAuthentication();
-                dropboxAccessToken = mdbapi.getSession().getOAuth2AccessToken();
-
-                mLIMEPref.setParameter(Lime.DROPBOX_ACCESS_TOKEN, dropboxAccessToken);
-                String type = mLIMEPref.getParameterString(Lime.DROPBOX_TYPE, null);
-
-                if(type != null && type.equals(Lime.BACKUP)){
-                    backupDropboxDrive(mdbapi);
-                }else if(type != null && type.equals(Lime.RESTORE)){
-                    restoreDropboxDrive(mdbapi);
-                }
-
-            } catch (IllegalStateException e) {
-                Log.i("DbAuthLog", "Error authenticating", e);
-            }
-        }
 
         // Reset DropBox Request
         mLIMEPref.setParameter(Lime.DROPBOX_REQUEST_FLAG, false);
@@ -750,8 +720,6 @@ public class SetupImFragment extends Fragment {
                                     backupLocalDrive();
                                 }else if(type.equalsIgnoreCase(Lime.GOOGLE)){
                                     requestGoogleDrive(Lime.BACKUP);
-                                }else if(type.equalsIgnoreCase(Lime.DROPBOX)){
-                                    requestDropboxDrive(Lime.BACKUP);
                                 }
 
                             }else if(action.equalsIgnoreCase(Lime.RESTORE)){
@@ -760,8 +728,6 @@ public class SetupImFragment extends Fragment {
                                     restoreLocalDrive();
                                 }else if(type.equalsIgnoreCase(Lime.GOOGLE)){
                                     requestGoogleDrive(Lime.RESTORE);
-                                }else if(type.equalsIgnoreCase(Lime.DROPBOX)){
-                                    requestDropboxDrive(Lime.RESTORE);
                                 }
 
                             }
@@ -815,51 +781,15 @@ public class SetupImFragment extends Fragment {
         }
     }
 
-    public void requestDropboxDrive(String type){
-
-        mLIMEPref.setParameter(Lime.DROPBOX_TYPE, type);
-        mLIMEPref.setParameter(Lime.DROPBOX_REQUEST_FLAG, true);
-
-        AppKeyPair appKeys = new AppKeyPair(Lime.DROPBOX_APP_KEY, Lime.DROPBOX_APP_SECRET);
-        AndroidAuthSession session = new AndroidAuthSession(appKeys);
-        mdbapi = new DropboxAPI<>(session);
-
-        dropboxAccessToken = mLIMEPref.getParameterString(Lime.DROPBOX_ACCESS_TOKEN, null);
-        if(dropboxAccessToken == null){
-            mdbapi.getSession().startOAuth2Authentication(this.getActivity().getApplicationContext());
-        }else{
-
-            mdbapi = new DropboxAPI<>(new AndroidAuthSession(appKeys, dropboxAccessToken));
-
-            if(mdbapi.getSession().isLinked()){
-                if(type != null && type.equals(Lime.BACKUP)){
-                    backupDropboxDrive(mdbapi);
-                }else if(type != null && type.equals(Lime.RESTORE)){
-                    restoreDropboxDrive(mdbapi);
-                }
-            }else{
-                mdbapi.getSession().startOAuth2Authentication(this.getActivity().getApplicationContext());
-            }
-        }
-    }
-
-    public void backupDropboxDrive(DropboxAPI mdbapi){
-        initialThreadTask(Lime.BACKUP, Lime.DROPBOX, mdbapi);
-    }
-
-    public void restoreDropboxDrive(DropboxAPI mdbapi){
-        initialThreadTask(Lime.RESTORE, Lime.DROPBOX, mdbapi);
-    }
-
     public void backupLocalDrive(){
-        initialThreadTask(Lime.BACKUP, Lime.LOCAL, null);
+        initialThreadTask(Lime.BACKUP, Lime.LOCAL);
     }
 
     public void restoreLocalDrive(){
-        initialThreadTask(Lime.RESTORE, Lime.LOCAL, null);
+        initialThreadTask(Lime.RESTORE, Lime.LOCAL);
     }
 
-    public void initialThreadTask(String action, String type, DropboxAPI mdbapi) {
+    public void initialThreadTask(String action, String type) {
 
         // Default Setting
         mLIMEPref.setParameter("dbtarget", Lime.DEVICE);
@@ -868,13 +798,13 @@ public class SetupImFragment extends Fragment {
             if(backupthread != null && backupthread.isAlive()){
                 handler.removeCallbacks(backupthread);
             }
-            backupthread = new Thread(new SetupImBackupRunnable(this, handler, type, mdbapi));
+            backupthread = new Thread(new SetupImBackupRunnable(this, handler, type));
             backupthread.start();
         }else if(action.equals(Lime.RESTORE)){
             if(restorethread != null && restorethread.isAlive()){
                 handler.removeCallbacks(restorethread);
             }
-            restorethread = new Thread(new SetupImRestoreRunnable(this, handler, type, mdbapi));
+            restorethread = new Thread(new SetupImRestoreRunnable(this, handler, type));
             restorethread.start();
         }
     }

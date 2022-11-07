@@ -248,13 +248,13 @@ public class MainActivity extends AppCompatActivity
             e.printStackTrace();
         }
 
-        String cversion = mLIMEPref.getParameterString("current_version", "");
-        if (cversion == null || cversion.isEmpty() || !cversion.equals(versionstr)) {
-            FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-            HelpDialog dialog = HelpDialog.newInstance();
-            dialog.show(ft, "helpdialog");
-            mLIMEPref.setParameter("current_version", versionstr);
-        }
+//        String cversion = mLIMEPref.getParameterString("current_version", "");
+//        if (cversion == null || cversion.isEmpty() || !cversion.equals(versionstr)) {
+//            FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+//            HelpDialog dialog = HelpDialog.newInstance();
+//            dialog.show(ft, "helpdialog");
+//            mLIMEPref.setParameter("current_version", versionstr);
+//        }
 
         // ATTENTION: This was auto-generated to implement the App Indexing API.
         // See https://g.co/AppIndexing/AndroidStudio for more information.

@@ -140,23 +140,6 @@
             android:theme="@android:style/Theme.Translucent" />
 
         <activity
-            android:name="com.dropbox.client2.android.AuthActivity"
-            android:configChanges="orientation|keyboard"
-            android:launchMode="singleTask"
-          android:exported="true">
-            <intent-filter>
-
-                <!-- Change this to be db- followed by your app key -->
-                <data android:scheme="db-keuuzhfc6efjf6t" />
-
-                <action android:name="android.intent.action.VIEW" />
-
-                <category android:name="android.intent.category.BROWSABLE" />
-                <category android:name="android.intent.category.DEFAULT" />
-            </intent-filter>
-        </activity>
-
-        <activity
             android:name=".ui.SetupImGoogleActivity"
             android:label="@string/title_activity_setup_im_google"
             android:theme="@style/Theme.AppCompat.Transparent" >

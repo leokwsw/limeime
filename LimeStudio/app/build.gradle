@@ -77,6 +77,5 @@ dependencies {
   implementation("org.mortbay.jetty:jetty-util:6.1.26")
   implementation("com.google.code.findbugs:jsr305:3.0.2")
   implementation('com.google.apis:google-api-services-drive:v3-rev136-1.25.0')
-  implementation files('libs/dropbox-android-sdk-1.6.3.jar')
 //  implementation("com.googlecode.json-simple:json-simple:1.1")
 }
