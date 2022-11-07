@@ -41,9 +41,6 @@ import android.widget.GridView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.android.gms.ads.AdRequest;
-import com.google.android.gms.ads.AdView;
-
 import net.toload.main.hd.Lime;
 import net.toload.main.hd.MainActivity;
 import net.toload.main.hd.R;
@@ -54,12 +51,6 @@ import net.toload.main.hd.limedb.LimeDB;
 
 import java.util.ArrayList;
 import java.util.List;
-
-/* Vpon import
-import com.vpadn.ads.VpadnAdRequest;
-import com.vpadn.ads.VpadnAdSize;
-import com.vpadn.ads.VpadnBanner;
-*/
 
 /**
  * Fragment used for managing interactions for and presentation of a navigation drawer.
@@ -248,35 +239,6 @@ public class ManageRelatedFragment extends Fragment {
         this.txtNavigationInfo = (TextView) rootView.findViewById(R.id.txtNavigationInfo);
 
         searchrelated(null);
-
-
-        // Handle AD Display
-        boolean paymentflag = mLIMEPref.getParameterBoolean(Lime.PAYMENT_FLAG, false);
-        if(!paymentflag) {
-            /*VPon add.
-            adBannerLayout = (RelativeLayout) rootView.findViewById(R.id.adLayout);
-            vpadnBanner = new VpadnBanner(getActivity(), Lime.VPON_BANNER_ID, VpadnAdSize.SMART_BANNER, "TW");
-
-            VpadnAdRequest adRequest = new VpadnAdRequest();
-            adRequest.setEnableAutoRefresh(true);
-            vpadnBanner.loadAd(adRequest);
-
-            adBannerLayout.addView(vpadnBanner);
-            */
-            AdRequest adRequest = new AdRequest.Builder()
-                    .addTestDevice(AdRequest.DEVICE_ID_EMULATOR)
-                    .build();
-
-
-            AdView mAdView = (AdView) rootView.findViewById(R.id.adView);
-            mAdView.loadAd(adRequest);
-
-        }
-        else{
-            AdView mAdView = (AdView) rootView.findViewById(R.id.adView);
-            mAdView.setVisibility(View.GONE);
-
-        }
 
         return rootView;
     }

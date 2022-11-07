@@ -74,8 +74,6 @@ public class MainActivityHandler extends Handler {
         }else if(action != null && action.equalsIgnoreCase("sharetxt")){
             String filepath = msg.getData().getString("filepath");
             activity.shareTo(filepath, Lime.SHARE_TYPE_TXT);
-        }else if(action != null && action.equalsIgnoreCase("initialpreference")){
-            activity.initialDefaultPreference();
         }else if(action != null && action.equalsIgnoreCase("showmessageboard")){
             activity.showMessageBoard();
         }
@@ -112,14 +110,6 @@ public class MainActivityHandler extends Handler {
         this.sendMessageDelayed(m, 1);
     }
 
-    public void showToastMessage(String message, int length){
-        Message m = new Message();
-                m.getData().putString("action", "toast");
-                m.getData().putString("message", message);
-                m.getData().putInt("length", length);
-        this.sendMessageDelayed(m, 1);
-    }
-
     public void shareTxtTo(String filepath){
         Message m = new Message();
         m.getData().putString("action", "sharetxt");
@@ -131,18 +121,6 @@ public class MainActivityHandler extends Handler {
         Message m = new Message();
         m.getData().putString("action", "sharezip");
         m.getData().putString("filepath", filepath);
-        this.sendMessageDelayed(m, 1);
-    }
-
-    public void initialDefaultPreference(){
-        Message m = new Message();
-        m.getData().putString("action", "initialpreference");
-        this.sendMessageDelayed(m, 1000);
-    }
-
-    public void showMessageBoard() {
-        Message m = new Message();
-        m.getData().putString("action", "showmessageboard");
         this.sendMessageDelayed(m, 1);
     }
 }

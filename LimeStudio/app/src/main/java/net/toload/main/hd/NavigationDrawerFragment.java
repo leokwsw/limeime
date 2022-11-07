@@ -55,8 +55,6 @@ import net.toload.main.hd.global.LIMEUtilities;
 import net.toload.main.hd.limedb.LimeDB;
 import net.toload.main.hd.limesettings.LIMEPreferenceHC;
 import net.toload.main.hd.ui.HelpDialog;
-import net.toload.main.hd.ui.PaymentDialog;
-import net.toload.main.hd.ui.ShareDialog;
 
 import java.util.List;
 
@@ -324,12 +322,7 @@ public class NavigationDrawerFragment extends Fragment {
         if (mDrawerToggle.onOptionsItemSelected(item)) {
             return true;
         }
-
-        if(item.getItemId() == R.id.action_share){
-            FragmentTransaction ft = getFragmentManager().beginTransaction();
-            ShareDialog dialog = ShareDialog.newInstance();
-            dialog.show(ft, "sharedialog");
-        }else if(item.getItemId() == R.id.action_preference){
+            if(item.getItemId() == R.id.action_preference){
             /*  Targeting at SDK level > 16 now.
             if(android.os.Build.VERSION.SDK_INT < 11){  //Jeremy '12,4,30 Add for deprecated preferenceActivity after API 11 (HC)
                 Intent setting = new Intent(this.getActivity(), LIMEPreference.class);
@@ -368,11 +361,6 @@ public class NavigationDrawerFragment extends Fragment {
 
             AlertDialog alert = builder.create();
             alert.show();
-
-        }else if(item.getItemId() == R.id.action_adfree){
-            FragmentTransaction ft = getFragmentManager().beginTransaction();
-            PaymentDialog dialog = PaymentDialog.newInstance();
-            dialog.show(ft, "paymentdialog");
         }
 
         /*else if(item.getItemId() == R.id.action_news){

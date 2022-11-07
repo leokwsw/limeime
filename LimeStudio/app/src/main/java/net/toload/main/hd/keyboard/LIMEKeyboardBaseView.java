@@ -43,6 +43,7 @@ import android.graphics.Paint;
 import android.graphics.Paint.Align;
 import android.graphics.PorterDuff;
 import android.graphics.Rect;
+import android.graphics.Region;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
 import android.os.Handler;
@@ -945,7 +946,7 @@ public class LIMEKeyboardBaseView extends View implements PointerTracker.UIProxy
             mKeyboardChanged = false;
         }
         final Canvas canvas = mCanvas;
-        canvas.clipRect(mDirtyRect, Op.INTERSECT); // fix java.lang.IllegalArgumentException: Invalid Region.Op - only INTERSECT and DIFFERENCE are allowed
+        canvas.clipRect(mDirtyRect, Region.Op.INTERSECT); // fix java.lang.IllegalArgumentException: Invalid Region.Op - only INTERSECT and DIFFERENCE are allowed
 
         if (mKeyboard == null) return;
 

@@ -504,67 +504,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="5dp"
             android:layout_marginBottom="5dp" />
-
-        <TextView
-          android:visibility="gone"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceLarge"
-            android:text="@string/setup_im_download_old"
-            android:id="@+id/textView55" />
-        <TextView
-          android:visibility="gone"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceMedium"
-            android:text="@string/setup_im_download_old_summary"
-            android:id="@+id/textView53"
-            android:layout_marginBottom="5dp" />
-
-        <TableLayout
-          android:visibility="gone"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-
-            <TableRow
-                android:layout_width="fill_parent"
-                android:layout_height="fill_parent"
-                android:layout_marginBottom="5dp">
-
-                <Button
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:text="@string/setup_im_download_old_version"
-                    android:id="@+id/btnDownloadOldVersion"
-                    android:layout_gravity="center_horizontal"
-                    android:layout_weight="1"
-                    android:padding="10dp"
-                    android:layout_marginRight="10dp"
-                    android:layout_marginLeft="10dp" />
-
-            </TableRow>
-        </TableLayout>
-
     </LinearLayout>
     </LinearLayout>
     </ScrollView>
-
-    <!--RelativeLayout
-    android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/adLayout">
-    </RelativeLayout-->
-
-    <com.google.android.gms.ads.AdView
-        android:id="@+id/adView"
-      android:visibility="gone"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerHorizontal="true"
-        android:layout_alignParentBottom="true"
-        ads:adSize="SMART_BANNER"
-        ads:adUnitId="@string/ad_unit_banner">
-    </com.google.android.gms.ads.AdView>
-
-
 </LinearLayout>
