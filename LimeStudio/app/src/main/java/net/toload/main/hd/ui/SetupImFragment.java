@@ -34,16 +34,19 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.database.Cursor;
 import android.graphics.Typeface;
 import android.net.ConnectivityManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.RemoteException;
+
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.core.content.ContextCompat;
+
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -61,23 +64,19 @@ import net.toload.main.hd.global.LIMEUtilities;
 import net.toload.main.hd.limedb.LimeDB;
 
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.HashMap;
 import java.util.List;
-
-//admob
-//google drive
-/*  vpon import
-import com.vpadn.ads.VpadnAdRequest;
-import com.vpadn.ads.VpadnAdSize;
-import com.vpadn.ads.VpadnBanner;
-*/
-// admob import
 
 /**
  * Fragment used for managing interactions for and presentation of a navigation drawer.
  * See the <a href="https://developer.android.com/design/patterns/navigation-drawer.html#Interaction">
  * design guidelines</a> for a complete explanation of the behaviors implemented here.
  */
+
 /**
  * A placeholder fragment containing a simple rootView.
  */
@@ -155,7 +154,7 @@ public class SetupImFragment extends Fragment {
         super.onPause();
 
         // Update IM pick up list items
-        if(imlist != null && imlist.size() > 0){
+        if (imlist != null && imlist.size() > 0) {
             mLIMEPref.syncIMActivatedState(imlist);
         }
 
@@ -174,7 +173,7 @@ public class SetupImFragment extends Fragment {
     public static SetupImFragment newInstance(int sectionNumber) {
         SetupImFragment frg = new SetupImFragment();
         Bundle args = new Bundle();
-                args.putInt(ARG_SECTION_NUMBER, sectionNumber);
+        args.putInt(ARG_SECTION_NUMBER, sectionNumber);
         frg.setArguments(args);
         return frg;
     }
@@ -209,30 +208,30 @@ public class SetupImFragment extends Fragment {
         progress = new ProgressDialog(activity);
         progress.setCancelable(false);
         progress.setProgressStyle(spinnerStyle ? ProgressDialog.STYLE_SPINNER : ProgressDialog.STYLE_HORIZONTAL);
-        if(message!=null) progress.setMessage(message);
-        if(!spinnerStyle) progress.setProgress(0);
+        if (message != null) progress.setMessage(message);
+        if (!spinnerStyle) progress.setProgress(0);
 
         progress.show();
 
     }
 
-    public void cancelProgress(){
-        if(progress.isShowing()){
+    public void cancelProgress() {
+        if (progress.isShowing()) {
             progress.dismiss();
             handler.initialImButtons();
         }
     }
 
-    public void setProgressIndeterminate(boolean flag){
+    public void setProgressIndeterminate(boolean flag) {
         progress.setIndeterminate(flag);
     }
 
-    public void updateProgress(int value){
-          progress.setProgress(value);
+    public void updateProgress(int value) {
+        progress.setProgress(value);
     }
 
-    public void updateProgress(String value){
-        if(progress != null){
+    public void updateProgress(String value) {
+        if (progress != null) {
             progress.setMessage(value);
         }
     }
@@ -336,7 +335,7 @@ public class SetupImFragment extends Fragment {
         PackageInfo pInfo;
         try {
             pInfo = getActivity().getPackageManager().getPackageInfo(getActivity().getPackageName(), 0);
-            String versionstr = "v"+ pInfo.versionName + " - " + pInfo.versionCode;
+            String versionstr = "v" + pInfo.versionName + " - " + pInfo.versionCode;
             txtVersion = (TextView) rootView.findViewById(R.id.txtVersion);
             txtVersion.setText(versionstr);
         } catch (PackageManager.NameNotFoundException e) {
@@ -346,17 +345,17 @@ public class SetupImFragment extends Fragment {
         return rootView;
     }
 
-    public void initialbutton(){
+    public void initialbutton() {
 
         HashMap<String, String> check = new HashMap<>();
 
         // Load Menu Item
         //if(!mLIMEPref.getDatabaseOnHold()){
-        if(!DBSrv.isDatabseOnHold()){
+        if (!DBSrv.isDatabseOnHold()) {
             try {
                 //datasource.open();
                 imlist = datasource.getIm(null, Lime.IM_TYPE_NAME);
-                for(int i = 0; i < imlist.size() ; i++){
+                for (int i = 0; i < imlist.size(); i++) {
                     check.put(imlist.get(i).getCode(), imlist.get(i).getDesc());
                 }
 
@@ -364,14 +363,14 @@ public class SetupImFragment extends Fragment {
                 mLIMEPref.syncIMActivatedState(imlist);
 
                 Context ctx = getActivity().getApplicationContext();
-                if(LIMEUtilities.isLIMEEnabled(getActivity().getApplicationContext())){  //LIME is activated in system
+                if (LIMEUtilities.isLIMEEnabled(getActivity().getApplicationContext())) {  //LIME is activated in system
                     btnSetupImSystemSettings.setVisibility(View.GONE);
                     rootView.findViewById(R.id.setup_im_system_settings_description).setVisibility(View.GONE);
                     rootView.findViewById(R.id.SetupImList).setVisibility(View.VISIBLE);
-                    if(LIMEUtilities.isLIMEActive(getActivity().getApplicationContext()) &&
+                    if (LIMEUtilities.isLIMEActive(getActivity().getApplicationContext()) &&
                             ContextCompat.checkSelfPermission(this.getActivity(),
                                     Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED
-                            ) {  //LIME is activated, also the active Keyboard, and write storage permission is grated
+                    ) {  //LIME is activated, also the active Keyboard, and write storage permission is grated
                         btnSetupImSystemIMPicker.setVisibility(View.GONE);
                         rootView.findViewById(R.id.Setup_Wizard).setVisibility(View.GONE);
                         btnSetupImBackupLocal.setEnabled(true);
@@ -382,23 +381,18 @@ public class SetupImFragment extends Fragment {
                         btnSetupImRestoreDropbox.setEnabled(true);
                         btnSetupImImportStandard.setEnabled(true);
                         btnSetupImImportRelated.setEnabled(true);
-                    }
-                    else  //LIME is activated, but not active keyboard
+                    } else  //LIME is activated, but not active keyboard
                     {
-                        if(LIMEUtilities.isLIMEActive(getActivity().getApplicationContext()))
-                        {
+                        if (LIMEUtilities.isLIMEActive(getActivity().getApplicationContext())) {
                             btnSetupImSystemIMPicker.setVisibility(View.GONE);
                             rootView.findViewById(R.id.setup_im_system_impicker_description).setVisibility(View.GONE);
-                        }
-                        else
-                        {
+                        } else {
                             btnSetupImSystemIMPicker.setVisibility(View.VISIBLE);
                             rootView.findViewById(R.id.setup_im_system_impicker_description).setVisibility(View.VISIBLE);
                         }
                         //Check permission for > API 23
                         if (ContextCompat.checkSelfPermission(this.getActivity(),
-                                Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED)
-                        {
+                                Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
                             rootView.findViewById(R.id.setup_im_grant_permission).setVisibility((View.GONE));
                             btnSetupImGrantPermission.setVisibility(View.GONE);
                             btnSetupImBackupLocal.setEnabled(true);
@@ -409,9 +403,7 @@ public class SetupImFragment extends Fragment {
                             btnSetupImRestoreDropbox.setEnabled(true);
                             btnSetupImImportStandard.setEnabled(true);
                             btnSetupImImportRelated.setEnabled(true);
-                        }
-                        else
-                        {
+                        } else {
                             rootView.findViewById(R.id.setup_im_grant_permission).setVisibility((View.VISIBLE));
                             btnSetupImGrantPermission.setVisibility(View.VISIBLE);
                             btnSetupImBackupLocal.setEnabled(false);
@@ -425,7 +417,7 @@ public class SetupImFragment extends Fragment {
                         }
 
                     }
-                }else {
+                } else {
                     btnSetupImSystemSettings.setVisibility(View.VISIBLE);
                     rootView.findViewById(R.id.setup_im_system_settings_description).setVisibility(View.VISIBLE);
                     btnSetupImSystemIMPicker.setVisibility(View.GONE);
@@ -434,7 +426,6 @@ public class SetupImFragment extends Fragment {
                     rootView.findViewById(R.id.setup_im_system_impicker_description).setVisibility(View.GONE);
                     rootView.findViewById(R.id.SetupImList).setVisibility(View.GONE);
                 }
-
 
 
                 btnSetupImGrantPermission.setOnClickListener(new View.OnClickListener() {
@@ -460,15 +451,14 @@ public class SetupImFragment extends Fragment {
                     }
                 });
 
-                if(check.get(Lime.DB_TABLE_CUSTOM) != null){
+                if (check.get(Lime.DB_TABLE_CUSTOM) != null) {
                     btnSetupImImportStandard.setAlpha(Lime.HALF_ALPHA_VALUE);
                     btnSetupImImportStandard.setText(check.get(Lime.DB_TABLE_CUSTOM));
                     btnSetupImImportStandard.setTypeface(null, Typeface.ITALIC);
-                }else {
+                } else {
                     btnSetupImImportStandard.setAlpha(Lime.NORMAL_ALPHA_VALUE);
                     btnSetupImImportStandard.setTypeface(null, Typeface.BOLD);
                 }
-
 
 
                 btnSetupImImportStandard.setOnClickListener(new View.OnClickListener() {
@@ -492,10 +482,10 @@ public class SetupImFragment extends Fragment {
                     }
                 });
 
-                if(check.get(Lime.DB_TABLE_PHONETIC) != null){
+                if (check.get(Lime.DB_TABLE_PHONETIC) != null) {
                     btnSetupImPhonetic.setAlpha(Lime.HALF_ALPHA_VALUE);
                     btnSetupImPhonetic.setTypeface(null, Typeface.ITALIC);
-                }else {
+                } else {
                     btnSetupImPhonetic.setAlpha(Lime.NORMAL_ALPHA_VALUE);
                     btnSetupImPhonetic.setTypeface(null, Typeface.BOLD);
                 }
@@ -510,10 +500,10 @@ public class SetupImFragment extends Fragment {
                 });
 
 
-                if(check.get(Lime.DB_TABLE_CJ) != null){
+                if (check.get(Lime.DB_TABLE_CJ) != null) {
                     btnSetupImCj.setAlpha(Lime.HALF_ALPHA_VALUE);
                     btnSetupImCj.setTypeface(null, Typeface.ITALIC);
-                }else {
+                } else {
                     btnSetupImCj.setAlpha(Lime.NORMAL_ALPHA_VALUE);
                     btnSetupImCj.setTypeface(null, Typeface.BOLD);
                 }
@@ -528,11 +518,10 @@ public class SetupImFragment extends Fragment {
                 });
 
 
-
-                if(check.get(Lime.DB_TABLE_CJ5) != null){
+                if (check.get(Lime.DB_TABLE_CJ5) != null) {
                     btnSetupImCj5.setAlpha(Lime.HALF_ALPHA_VALUE);
                     btnSetupImCj5.setTypeface(null, Typeface.ITALIC);
-                }else {
+                } else {
                     btnSetupImCj5.setAlpha(Lime.NORMAL_ALPHA_VALUE);
                     btnSetupImCj5.setTypeface(null, Typeface.BOLD);
                 }
@@ -546,10 +535,10 @@ public class SetupImFragment extends Fragment {
                     }
                 });
 
-                if(check.get(Lime.DB_TABLE_SCJ) != null){
+                if (check.get(Lime.DB_TABLE_SCJ) != null) {
                     btnSetupImScj.setAlpha(Lime.HALF_ALPHA_VALUE);
                     btnSetupImScj.setTypeface(null, Typeface.ITALIC);
-                }else {
+                } else {
                     btnSetupImScj.setAlpha(Lime.NORMAL_ALPHA_VALUE);
                     btnSetupImScj.setTypeface(null, Typeface.BOLD);
                 }
@@ -562,10 +551,10 @@ public class SetupImFragment extends Fragment {
                     }
                 });
 
-                if(check.get(Lime.DB_TABLE_ECJ) != null){
+                if (check.get(Lime.DB_TABLE_ECJ) != null) {
                     btnSetupImEcj.setAlpha(Lime.HALF_ALPHA_VALUE);
                     btnSetupImEcj.setTypeface(null, Typeface.ITALIC);
-                }else {
+                } else {
                     btnSetupImEcj.setAlpha(Lime.NORMAL_ALPHA_VALUE);
                     btnSetupImEcj.setTypeface(null, Typeface.BOLD);
                 }
@@ -579,10 +568,10 @@ public class SetupImFragment extends Fragment {
                     }
                 });
 
-                if(check.get(Lime.DB_TABLE_DAYI) != null){
+                if (check.get(Lime.DB_TABLE_DAYI) != null) {
                     btnSetupImDayi.setAlpha(Lime.HALF_ALPHA_VALUE);
                     btnSetupImDayi.setTypeface(null, Typeface.ITALIC);
-                }else {
+                } else {
                     btnSetupImDayi.setAlpha(Lime.NORMAL_ALPHA_VALUE);
                     btnSetupImDayi.setTypeface(null, Typeface.BOLD);
                 }
@@ -596,10 +585,10 @@ public class SetupImFragment extends Fragment {
                     }
                 });
 
-                if(check.get(Lime.DB_TABLE_EZ) != null){
+                if (check.get(Lime.DB_TABLE_EZ) != null) {
                     btnSetupImEz.setAlpha(Lime.HALF_ALPHA_VALUE);
                     btnSetupImEz.setTypeface(null, Typeface.ITALIC);
-                }else {
+                } else {
                     btnSetupImEz.setAlpha(Lime.NORMAL_ALPHA_VALUE);
                     btnSetupImEz.setTypeface(null, Typeface.BOLD);
                 }
@@ -613,10 +602,10 @@ public class SetupImFragment extends Fragment {
                     }
                 });
 
-                if(check.get(Lime.DB_TABLE_ARRAY) != null){
+                if (check.get(Lime.DB_TABLE_ARRAY) != null) {
                     btnSetupImArray.setAlpha(Lime.HALF_ALPHA_VALUE);
                     btnSetupImArray.setTypeface(null, Typeface.ITALIC);
-                }else {
+                } else {
                     btnSetupImArray.setAlpha(Lime.NORMAL_ALPHA_VALUE);
                     btnSetupImArray.setTypeface(null, Typeface.BOLD);
                 }
@@ -630,10 +619,10 @@ public class SetupImFragment extends Fragment {
                     }
                 });
 
-                if(check.get(Lime.DB_TABLE_ARRAY10) != null){
+                if (check.get(Lime.DB_TABLE_ARRAY10) != null) {
                     btnSetupImArray10.setAlpha(Lime.HALF_ALPHA_VALUE);
                     btnSetupImArray10.setTypeface(null, Typeface.ITALIC);
-                }else {
+                } else {
                     btnSetupImArray10.setAlpha(Lime.NORMAL_ALPHA_VALUE);
                     btnSetupImArray10.setTypeface(null, Typeface.BOLD);
                 }
@@ -648,10 +637,10 @@ public class SetupImFragment extends Fragment {
                 });
 
 
-                if(check.get(Lime.DB_TABLE_HS) != null){
+                if (check.get(Lime.DB_TABLE_HS) != null) {
                     btnSetupImHs.setAlpha(Lime.HALF_ALPHA_VALUE);
                     btnSetupImHs.setTypeface(null, Typeface.ITALIC);
-                }else {
+                } else {
                     btnSetupImHs.setAlpha(Lime.NORMAL_ALPHA_VALUE);
                     btnSetupImHs.setTypeface(null, Typeface.BOLD);
                 }
@@ -665,10 +654,10 @@ public class SetupImFragment extends Fragment {
                     }
                 });
 
-                if(check.get(Lime.DB_TABLE_WB) != null){
+                if (check.get(Lime.DB_TABLE_WB) != null) {
                     btnSetupImWb.setAlpha(Lime.HALF_ALPHA_VALUE);
                     btnSetupImWb.setTypeface(null, Typeface.ITALIC);
-                }else {
+                } else {
                     btnSetupImWb.setAlpha(Lime.NORMAL_ALPHA_VALUE);
                     btnSetupImWb.setTypeface(null, Typeface.BOLD);
                 }
@@ -682,10 +671,10 @@ public class SetupImFragment extends Fragment {
                     }
                 });
 
-                if(check.get(Lime.DB_TABLE_PINYIN) != null){
+                if (check.get(Lime.DB_TABLE_PINYIN) != null) {
                     btnSetupImPinyin.setAlpha(Lime.HALF_ALPHA_VALUE);
                     btnSetupImPinyin.setTypeface(null, Typeface.ITALIC);
-                }else {
+                } else {
                     btnSetupImPinyin.setAlpha(Lime.NORMAL_ALPHA_VALUE);
                     btnSetupImPinyin.setTypeface(null, Typeface.BOLD);
                 }
@@ -702,10 +691,10 @@ public class SetupImFragment extends Fragment {
                 e.printStackTrace();
             }
         }
-        
+
     }
 
-    public void showAlertDialog(final String action, final String type, String message){
+    public void showAlertDialog(final String action, final String type, String message) {
 
         AlertDialog.Builder builder = new AlertDialog.Builder(activity);
         builder.setMessage(message);
@@ -713,20 +702,20 @@ public class SetupImFragment extends Fragment {
         builder.setPositiveButton(getResources().getString(R.string.dialog_confirm),
                 new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
-                        if(action != null){
-                            if(action.equalsIgnoreCase(Lime.BACKUP)) {
+                        if (action != null) {
+                            if (action.equalsIgnoreCase(Lime.BACKUP)) {
 
-                                if(type.equalsIgnoreCase(Lime.LOCAL)){
+                                if (type.equalsIgnoreCase(Lime.LOCAL)) {
                                     backupLocalDrive();
-                                }else if(type.equalsIgnoreCase(Lime.GOOGLE)){
+                                } else if (type.equalsIgnoreCase(Lime.GOOGLE)) {
                                     requestGoogleDrive(Lime.BACKUP);
                                 }
 
-                            }else if(action.equalsIgnoreCase(Lime.RESTORE)){
+                            } else if (action.equalsIgnoreCase(Lime.RESTORE)) {
 
-                                if(type.equalsIgnoreCase(Lime.LOCAL)){
+                                if (type.equalsIgnoreCase(Lime.LOCAL)) {
                                     restoreLocalDrive();
-                                }else if(type.equalsIgnoreCase(Lime.GOOGLE)){
+                                } else if (type.equalsIgnoreCase(Lime.GOOGLE)) {
                                     requestGoogleDrive(Lime.RESTORE);
                                 }
 
@@ -750,9 +739,8 @@ public class SetupImFragment extends Fragment {
     }
 
 
-
     @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data){
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == Lime.PAYMENT_REQUEST_CODE) {
             String purchaseData = data.getStringExtra("INAPP_PURCHASE_DATA");
             //int responseCode = data.getIntExtra("RESPONSE_CODE", 0);
@@ -764,28 +752,75 @@ public class SetupImFragment extends Fragment {
                 showToastMessage(getResources().getString(R.string.payment_service_success), Toast.LENGTH_LONG);
                 //Log.i("LIME", "purchasing complete " + new Date() + " / " + purchaseData);
             }
-        }
-
-    }
-
-    public void requestGoogleDrive(String type){
-
-        if(type != null && type.equals(Lime.BACKUP)) {
-            Intent intent = new Intent().setClass(this.getActivity(), SetupImGoogleActivity.class);
-                    intent.putExtra("actiontype", Lime.BACKUP);
-            startActivity(intent);
-        }else{
-            Intent intent = new Intent().setClass(this.getActivity(), SetupImGoogleActivity.class);
-                    intent.putExtra("actiontype", Lime.RESTORE);
-            startActivity(intent);
+        } else if(requestCode == RESTORE_FILE_REQUEST_CODE) {
+            Uri uri = data.getData();
+            Log.i(TAG, "Uri : "+uri.toString());
+            restorethread = new Thread(new SetupImRestoreRunnable(this, handler, getFilePathFromUri(uri)));
+            restorethread.start();
+        } else if(requestCode == BACKUP_FILE_REQUEST_CODE) {
+            Uri uri = data.getData();
+            if(data != null){
+                backupthread = new Thread(new SetupImBackupRunnable(this, handler, Lime.LOCAL, uri));
+                backupthread.start();
+            }
         }
     }
 
-    public void backupLocalDrive(){
+    public String getFilePathFromUri(Uri uri) {
+        String fileName = Lime.DATABASE_BACKUP_NAME;
+        File file = new File(this.getContext().getExternalCacheDir(), fileName);
+        try (OutputStream outputStream = new FileOutputStream(file);
+             InputStream inputStream = getContext().getContentResolver().openInputStream(uri))
+        {
+            file.createNewFile();
+            copyFile(inputStream, outputStream); //Simply reads input to output stream
+            outputStream.flush();
+        } catch (Exception exception) {
+            // TODO
+        }
+
+        return file.getAbsolutePath();
+    }
+
+    private static void copyFile(InputStream in, OutputStream out) throws IOException {
+        byte[] buf = new byte[1024];
+        int len;
+        while ((len = in.read(buf)) > 0) {
+            out.write(buf, 0, len);
+        }
+    }
+
+    private String getFilePath(Uri uri) {
+        String filePath;
+        if (uri != null && "content".equals(uri.getScheme())) {
+            Cursor cursor = this.getContext().getContentResolver().query(uri, new String[] { android.provider.MediaStore.Images.ImageColumns.DATA }, null, null, null);
+            cursor.moveToFirst();
+            filePath = cursor.getString(0);
+            cursor.close();
+        } else {
+            filePath = uri.getPath();
+        }
+        return filePath;
+    }
+
+    public void requestGoogleDrive(String type) {
+
+        if (type != null && type.equals(Lime.BACKUP)) {
+            Intent intent = new Intent().setClass(this.getActivity(), SetupImGoogleActivity.class);
+            intent.putExtra("actiontype", Lime.BACKUP);
+            startActivity(intent);
+        } else {
+            Intent intent = new Intent().setClass(this.getActivity(), SetupImGoogleActivity.class);
+            intent.putExtra("actiontype", Lime.RESTORE);
+            startActivity(intent);
+        }
+    }
+
+    public void backupLocalDrive() {
         initialThreadTask(Lime.BACKUP, Lime.LOCAL);
     }
 
-    public void restoreLocalDrive(){
+    public void restoreLocalDrive() {
         initialThreadTask(Lime.RESTORE, Lime.LOCAL);
     }
 
@@ -795,19 +830,39 @@ public class SetupImFragment extends Fragment {
         mLIMEPref.setParameter("dbtarget", Lime.DEVICE);
 
         if (action.equals(Lime.BACKUP)) {
-            if(backupthread != null && backupthread.isAlive()){
+            if (backupthread != null && backupthread.isAlive()) {
                 handler.removeCallbacks(backupthread);
             }
-            backupthread = new Thread(new SetupImBackupRunnable(this, handler, type));
-            backupthread.start();
-        }else if(action.equals(Lime.RESTORE)){
-            if(restorethread != null && restorethread.isAlive()){
+//            backupthread = new Thread(new SetupImBackupRunnable(this, handler, type));
+//            backupthread.start();
+            launchBackupFilePicker();
+        } else if (action.equals(Lime.RESTORE)) {
+            if (restorethread != null && restorethread.isAlive()) {
                 handler.removeCallbacks(restorethread);
             }
-            restorethread = new Thread(new SetupImRestoreRunnable(this, handler, type));
-            restorethread.start();
+//            restorethread = new Thread(new SetupImRestoreRunnable(this, handler, type));
+//            restorethread.start();
+            launchRestoreFilePicker();
         }
     }
+
+    final static int BACKUP_FILE_REQUEST_CODE = 10421;
+
+    private void launchBackupFilePicker() {
+        Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT_TREE);
+        startActivityForResult(intent, BACKUP_FILE_REQUEST_CODE);
+    }
+
+    final static int RESTORE_FILE_REQUEST_CODE = 273;
+
+    private void launchRestoreFilePicker() {
+        Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
+        intent.addCategory(Intent.CATEGORY_OPENABLE);
+        intent.setType("application/zip");
+
+        startActivityForResult(intent, RESTORE_FILE_REQUEST_CODE);
+    }
+
 
     public void showToastMessage(String msg, int length) {
         Toast toast = Toast.makeText(activity, msg, length);
@@ -818,9 +873,9 @@ public class SetupImFragment extends Fragment {
         btnSetupImImportStandard.setText(getResources().getString(R.string.setup_im_load_standard));
     }
 
-    public void resetImTable(String imtable, boolean backuplearning){
+    public void resetImTable(String imtable, boolean backuplearning) {
         try {
-            if(backuplearning){
+            if (backuplearning) {
                 datasource.backupUserRecords(imtable);
             }
             DBSrv.resetMapping(imtable);
@@ -830,40 +885,6 @@ public class SetupImFragment extends Fragment {
     }
 
     public void finishProgress(final String imtype) {
-
         cancelProgress();
-
-        /*boolean check = datasource.checkBackuptable(imtype);
-        if(check){
-
-            AlertDialog alertDialog = new AlertDialog.Builder(activity).create();
-            alertDialog.setTitle(activity.getResources().getString(R.string.setup_im_restore_learning_data));
-            alertDialog.setMessage(activity.getResources().getString(R.string.setup_im_restore_learning_data_message));
-            alertDialog.setButton(DialogInterface.BUTTON_POSITIVE, activity.getResources().getString(R.string.dialog_confirm),
-                    new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int which) {
-
-                            showProgress(true, activity.getResources().getString(R.string.setup_im_restore_learning_data));
-
-                            new Thread() {
-
-                                @Override
-                                public void run() {
-                                    datasource.restoreUserRecords(imtype);
-                                    cancelProgress();
-                                }
-                            }.start();
-                        }
-                    });
-            alertDialog.setButton(DialogInterface.BUTTON_NEGATIVE, activity.getResources().getString(R.string.dialog_cancel),
-                    new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int which) {
-                            dialog.dismiss();
-                        }
-                    });
-            alertDialog.show();
-        }else{
-            handler.cancelProgress();
-        }*/
     }
 }

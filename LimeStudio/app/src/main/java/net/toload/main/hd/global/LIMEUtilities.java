@@ -25,6 +25,7 @@
 package net.toload.main.hd.global;
 
 import android.annotation.TargetApi;
+import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.content.ComponentName;
 import android.content.Context;
@@ -51,6 +52,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
@@ -311,28 +313,41 @@ public class LIMEUtilities {
 
 	 */
 	@TargetApi(Build.VERSION_CODES.JELLY_BEAN)
-	public static void showNotification(Context context, Boolean autoCancel,  CharSequence title, CharSequence message, Intent intent){
+	public static void showNotification(Context context, Boolean autoCancel,  CharSequence title, CharSequence message, Intent intent, String channelId){
 
 		//Intent resultIntent = new Intent(context, MainActivity.class);
 		//PendingIntent pi = PendingIntent.getActivity(context, 0, resultIntent, 0);
 
 		NotificationCompat.Builder mBuilder =
 				new NotificationCompat.Builder(context)
+						.setChannelId(channelId)
 						.setLargeIcon(getNotificationIconBitmap(context))
 						.setContentTitle(title)
 						.setAutoCancel(autoCancel)
 						.setTicker(message)
 						.setContentText(message);
 
-		boolean lollipop = Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP;
-		if(lollipop){
-			mBuilder.setSmallIcon(R.drawable.logobw);
-		}else{
-			mBuilder.setSmallIcon(R.drawable.logo);
-		}
+		mBuilder.setSmallIcon(R.drawable.logobw);
 
 		NotificationManager mNotificationManager =
 						(NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+			if(
+					mNotificationManager
+							.getNotificationChannels()
+							.stream().noneMatch(c -> c.getId().equals(channelId))
+			){
+				mNotificationManager.createNotificationChannel(
+						new NotificationChannel(
+								channelId,
+								context.getText(R.string.ime_setting),
+								NotificationManager.IMPORTANCE_DEFAULT
+						)
+				);
+			}
+
+		}
 
 		mNotificationManager.notify(501, mBuilder.build());
 	}

@@ -24,6 +24,7 @@
 
 package net.toload.main.hd.ui;
 
+import android.net.Uri;
 import android.os.RemoteException;
 import net.toload.main.hd.DBServer;
 import net.toload.main.hd.Lime;
@@ -37,12 +38,14 @@ public class SetupImBackupRunnable implements Runnable {
 
     private SetupImHandler mHandler;
     //private GoogleAccountCredential mCredential;
+    private Uri folderUri;
 
-    public SetupImBackupRunnable(SetupImFragment fragment, SetupImHandler handler, String type) {
+    public SetupImBackupRunnable(SetupImFragment fragment, SetupImHandler handler, String type, Uri uri) {
         //this.mCredential = credential;
         this.mHandler = handler;
         this.mType = type;
         this.mFragment = fragment;
+        this.folderUri = uri;
     }
 
     @Override
@@ -57,7 +60,7 @@ public class SetupImBackupRunnable implements Runnable {
         // Preparing the file to be backup
         if (mType.equals(Lime.LOCAL) || mType.equals(Lime.GOOGLE) || mType.equals(Lime.DROPBOX)) {
             try {
-                DBServer.backupDatabase();
+                DBServer.backupDatabase(folderUri);
             } catch (RemoteException e) {
                 e.printStackTrace();
             }

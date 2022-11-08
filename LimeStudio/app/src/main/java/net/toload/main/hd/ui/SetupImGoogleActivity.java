@@ -127,12 +127,13 @@ public class SetupImGoogleActivity extends Activity implements
     public void backupToGoogle() {
 
         // Create backup File Temp
-        try {
-            DBServer.backupDatabase();
-        } catch (RemoteException e) {
-            e.printStackTrace();
-            finish();
-        }
+        // TODO: Google Drive backup
+//        try {
+//            DBServer.backupDatabase();
+//        } catch (RemoteException e) {
+//            e.printStackTrace();
+//            finish();
+//        }
 
         // Load old backup file
         Query query = new Query.Builder()
