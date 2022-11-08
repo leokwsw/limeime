@@ -54,6 +54,7 @@ public class Lime {
     public static final String DATABASE_IM_TEMP = "temp";
     public static final String DATABASE_IM_TEMP_EXT = "zip";
 
+    // TODO: self hosting
     public static final String DATABASE_OPENFOUNDRY_URL_BASED = "https://www.openfoundry.org/websvn/filedetails.php?repname=limeime&path=%2F";
     public static final String DATABASE_CLOUD_URL_BASED = "https://github.com/lime-ime/limeime/raw/master/Database/";
 

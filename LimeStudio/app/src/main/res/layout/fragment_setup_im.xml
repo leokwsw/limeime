@@ -27,8 +27,7 @@
     xmlns:ads="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    tools:context="net.toload.main.hd.ManageRelatedFragment">
+    android:orientation="vertical">
 
     <ScrollView
         android:layout_width="match_parent"
@@ -202,34 +201,6 @@
             </TableRow>
 
             <TableRow
-                android:layout_width="fill_parent"
-                android:layout_height="fill_parent"
-                android:layout_marginBottom="5dp">
-
-                <Button
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:text="@string/setup_im_backup_google"
-                    android:id="@+id/btnSetupImBackupGoogle"
-                    android:layout_gravity="center_horizontal"
-                    android:layout_weight="1"
-                    android:padding="5dp"
-                    android:layout_marginRight="10dp"
-                    android:layout_marginLeft="10dp" />
-
-                <Button
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:text="@string/setup_im_restore_google"
-                    android:id="@+id/btnSetupImRestoreGoogle"
-                    android:layout_weight="1"
-                    android:padding="5dp"
-                    android:layout_marginLeft="10dp"
-                    android:layout_marginRight="10dp" />
-            </TableRow>
-
-            <TableRow
-                android:visibility="gone"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_marginBottom="5dp">
@@ -255,7 +226,7 @@
                     android:layout_marginRight="10dp" />
             </TableRow>
         </TableLayout>
-        <Space
+        <View
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="5dp"
@@ -307,7 +278,7 @@
             </TableRow>
         </TableLayout>
 
-        <Space
+        <View
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
@@ -500,7 +471,7 @@
             </TableRow>
         </TableLayout>
 
-        <Space
+        <View
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="5dp"

@@ -24,15 +24,27 @@
 
 package net.toload.main.hd.ui;
 
+import android.os.AsyncTask;
 import android.os.RemoteException;
+
+import com.dropbox.client2.DropboxAPI;
+import com.dropbox.client2.ProgressListener;
+import com.dropbox.client2.android.AndroidAuthSession;
+import com.dropbox.client2.exception.DropboxException;
+import com.dropbox.client2.exception.DropboxServerException;
+import com.dropbox.client2.exception.DropboxUnlinkedException;
 
 import net.toload.main.hd.DBServer;
 import net.toload.main.hd.Lime;
 import net.toload.main.hd.R;
 import net.toload.main.hd.SearchServer;
+import net.toload.main.hd.global.LIME;
 import net.toload.main.hd.global.LIMEPreferenceManager;
 
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.IOException;
 
 /**
  * Created by Art Hung on 2015/4/26.
@@ -51,12 +63,17 @@ public class SetupImRestoreRunnable implements Runnable {
     private FileOutputStream mFos;
     private boolean mCanceled;
 
-    public SetupImRestoreRunnable(SetupImFragment fragment, SetupImHandler handler, String type) {
+    private String filePath;
+    private DropboxAPI<AndroidAuthSession> mdbapi;
+
+    public SetupImRestoreRunnable(SetupImFragment fragment, SetupImHandler handler, String type, String filePath, DropboxAPI mdbapi) {
         this.mHandler = handler;
         this.mType = type;
         this.mFragment = fragment;
         this.SearchSrv = new SearchServer(this.mFragment.getActivity());
         this.mLIMEPref = new LIMEPreferenceManager(this.mFragment.getActivity());
+        this.filePath = filePath;
+        this.mdbapi = mdbapi;
     }
 
     @Override
@@ -73,12 +90,25 @@ public class SetupImRestoreRunnable implements Runnable {
             case Lime.LOCAL:
                 try {
                     mHandler.showProgress(true, this.mFragment.getResources().getString(R.string.setup_im_restore_message));
-                    DBServer.restoreDatabase();
+                    DBServer.restoreDatabase(filePath);
                     mHandler.cancelProgress();
                 } catch (RemoteException e) {
                     e.printStackTrace();
                 }
                 break;
+            case Lime.DROPBOX:
+                mHandler.showProgress(false, this.mFragment.getResources().getString(R.string.setup_im_restore_message));
+                mHandler.setProgressIndeterminate(true);
+
+                File limedir = new File(LIME.LIME_SDCARD_FOLDER + File.separator);
+                if (!limedir.exists()) limedir.mkdirs();
+                File tempFile = new File(LIME.LIME_SDCARD_FOLDER + File.separator + LIME.DATABASE_CLOUD_TEMP);
+                tempFile.deleteOnExit();
+
+                restoreFromDropbox download = new restoreFromDropbox(mHandler, mFragment, mdbapi, LIME.DATABASE_BACKUP_NAME, tempFile);
+                download.execute();
+                break;
+
         }
 
         // Revoke the flag to force application check the payment status
@@ -185,5 +215,144 @@ public class SetupImRestoreRunnable implements Runnable {
 //            return null;
 //        }
 //    }
+
+    private class restoreFromDropbox extends AsyncTask<Void, Long, Boolean> {
+
+
+        private SetupImHandler mHandler;
+        private SetupImFragment mFragment;
+        private DropboxAPI<?> mApi;
+        private String mPath;
+        private File mFile;
+
+        private FileOutputStream mFos;
+        private String mErrorMsg;
+
+
+        public restoreFromDropbox(SetupImHandler handler, SetupImFragment fragment, DropboxAPI<?> api, String backupFile, File tempfile) {
+            // We set the context this way so we don't accidentally leak activities
+
+            mHandler = handler;
+            mFragment = fragment;
+            mApi = api;
+            mPath = backupFile;
+            mFile = tempfile;
+
+            mHandler.setProgressIndeterminate(false);
+            mHandler.updateProgress(mFragment.getText(R.string.l3_initial_dropbox_restore_start).toString());
+        }
+
+        @Override
+        protected Boolean doInBackground(Void... params) {
+
+
+            try {
+
+
+                // mOutputStream is class level field.
+                mFos = new FileOutputStream(mFile);
+                //DropboxFileInfo info =
+                mApi.getFile(mPath, null, mFos, new ProgressListener() {
+
+                    @Override
+                    public void onProgress(long bytes, long total) {
+                        if (!mCanceled) {
+                            Long[] bytess = {bytes, total};
+                            publishProgress(bytess);
+                        } else {
+                            if (mFos != null) {
+                                try {
+                                    mFos.close();
+                                } catch (IOException ignored) {
+                                }
+                            }
+                        }
+                    }
+                });
+
+
+            } catch (FileNotFoundException e) {
+                //Log.e("DbExampleLog", "File not found.");
+                mErrorMsg = mFragment.getText(R.string.l3_initial_dropbox_restore_error).toString();
+
+            } catch (DropboxUnlinkedException e) {
+                // The AuthSession wasn't properly authenticated or user unlinked.
+                mErrorMsg = mFragment.getText(R.string.l3_initial_dropbox_authetication_failed).toString();
+            } catch (DropboxServerException e) {
+                // Server-side exception.  These are examples of what could happen,
+                // but we don't do anything special with them here.
+                //if (e.error == DropboxServerException._304_NOT_MODIFIED) {
+                // won't happen since we don't pass in revision with metadata
+                //} else if (e.error == DropboxServerException._401_UNAUTHORIZED) {
+                // Unauthorized, so we should unlink them.  You may want to
+                // automatically log the user out in this case.
+                //} else if (e.error == DropboxServerException._403_FORBIDDEN) {
+                // Not allowed to access this
+                //} else if (e.error == DropboxServerException._404_NOT_FOUND) {
+                // path not found (or if it was the thumbnail, can't be
+                // thumbnailed)
+                //} else if (e.error == DropboxServerException._406_NOT_ACCEPTABLE) {
+                // too many entries to return
+                //} else if (e.error == DropboxServerException._415_UNSUPPORTED_MEDIA) {
+                // can't be thumbnailed
+                //} else if (e.error == DropboxServerException._507_INSUFFICIENT_STORAGE) {
+                // user is over quota
+                //} else {
+                // Something else
+                //}
+                // This gets the Dropbox error, translated into the user's language
+                mErrorMsg = e.body.userError;
+                if (mErrorMsg == null) {
+                    mErrorMsg = e.body.error;
+                }
+            } catch (DropboxException e) {
+                // Unknown error
+                //mErrorMsg = "Unknown error.  Try again.";
+                mErrorMsg = mFragment.getText(R.string.l3_initial_dropbox_failed).toString();
+
+            } finally {
+                if (mFos != null) {
+                    try {
+                        mFos.close();
+                        mFos = null;
+
+                        //Download finished. Restore db now.
+                        try {
+                            DBServer.restoreDatabase(mFile.getAbsolutePath());
+                        } catch (RemoteException e) {
+                            e.printStackTrace();
+                        } finally {
+                            return true;
+                        }
+                    } catch (IOException ignored) {
+                    }
+                }
+            }
+            return false;
+        }
+
+
+        @Override
+        protected void onProgressUpdate(Long... progress) {
+            int percent = (int) (100.0 * (double) progress[0] / progress[1] + 0.5);
+            mHandler.updateProgress(mFragment.getText(R.string.l3_initial_dropbox_downloading).toString());
+            mHandler.updateProgress(percent);
+        }
+
+        @Override
+        protected void onPostExecute(Boolean result) {
+            super.onPostExecute(result);
+            mHandler.cancelProgress();
+
+            if (result) {
+                DBServer.showNotificationMessage(mFragment.getText(R.string.l3_initial_dropbox_restore_end) + "");
+            } else {
+                DBServer.showNotificationMessage(mErrorMsg + "");
+            }
+
+        }
+
+
+    }
 }
 

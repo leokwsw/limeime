@@ -33,6 +33,7 @@
 
     <dimen name="max_height_for_fullscreen">1.4in</dimen>
     <dimen name="phone_key_height">58dip</dimen>
+    <!-- TODO: Mark keyboard each key height -->
     <dimen name="key_height">56dip</dimen>
     <dimen name="candidate_stripe_height">30sp</dimen>
     <dimen name="candidate_vertical_padding">10sp</dimen>

@@ -55,8 +55,13 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.dropbox.client2.DropboxAPI;
+import com.dropbox.client2.android.AndroidAuthSession;
+import com.dropbox.client2.session.AppKeyPair;
+
 import net.toload.main.hd.DBServer;
 import net.toload.main.hd.Lime;
+import net.toload.main.hd.MainActivity;
 import net.toload.main.hd.R;
 import net.toload.main.hd.data.Im;
 import net.toload.main.hd.global.LIMEPreferenceManager;
@@ -70,6 +75,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Fragment used for managing interactions for and presentation of a navigation drawer.
@@ -101,6 +107,10 @@ public class SetupImFragment extends Fragment {
     static final int REQUEST_ACCOUNT_PICKER_BACKUP = 1;
     static final int REQUEST_ACCOUNT_PICKER_RESTORE = 2;*/
 
+    // Dropbox
+    DropboxAPI<AndroidAuthSession> mdbapi;
+    String dropboxAccessToken;
+
     //Activate LIME IM
 
     Button btnSetupImSystemSettings;
@@ -127,8 +137,6 @@ public class SetupImFragment extends Fragment {
     // Backup Restore
     Button btnSetupImBackupLocal;
     Button btnSetupImRestoreLocal;
-    Button btnSetupImBackupGoogle;
-    Button btnSetupImRestoreGoogle;
     Button btnSetupImBackupDropbox;
     Button btnSetupImRestoreDropbox;
 
@@ -192,6 +200,28 @@ public class SetupImFragment extends Fragment {
     public void onResume() {
 
         super.onResume();
+
+        boolean dropboxrequest = mLIMEPref.getParameterBoolean(Lime.DROPBOX_REQUEST_FLAG, false);
+
+        if (dropboxrequest && mdbapi != null && mdbapi.getSession().authenticationSuccessful()) {
+            try {
+                // Required to complete auth, sets the access token on the session
+                mdbapi.getSession().finishAuthentication();
+                dropboxAccessToken = mdbapi.getSession().getOAuth2AccessToken();
+
+                mLIMEPref.setParameter(Lime.DROPBOX_ACCESS_TOKEN, dropboxAccessToken);
+                String type = mLIMEPref.getParameterString(Lime.DROPBOX_TYPE, null);
+
+                if(type != null && type.equals(Lime.BACKUP)){
+                    backupDropboxDrive();
+                }else if(type != null && type.equals(Lime.RESTORE)){
+                    restoreDropboxDrive();
+                }
+
+            } catch (IllegalStateException e) {
+                Log.i("DbAuthLog", "Error authenticating", e);
+            }
+        }
 
         // Reset DropBox Request
         mLIMEPref.setParameter(Lime.DROPBOX_REQUEST_FLAG, false);
@@ -279,8 +309,6 @@ public class SetupImFragment extends Fragment {
         // Backup and Restore Setting
         btnSetupImBackupLocal = (Button) rootView.findViewById(R.id.btnSetupImBackupLocal);
         btnSetupImRestoreLocal = (Button) rootView.findViewById(R.id.btnSetupImRestoreLocal);
-        btnSetupImBackupGoogle = (Button) rootView.findViewById(R.id.btnSetupImBackupGoogle);
-        btnSetupImRestoreGoogle = (Button) rootView.findViewById(R.id.btnSetupImRestoreGoogle);
         btnSetupImBackupDropbox = (Button) rootView.findViewById(R.id.btnSetupImBackupDropbox);
         btnSetupImRestoreDropbox = (Button) rootView.findViewById(R.id.btnSetupImRestoreDropbox);
 
@@ -298,23 +326,6 @@ public class SetupImFragment extends Fragment {
             }
         });
 
-        btnSetupImBackupGoogle.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (connManager.getActiveNetworkInfo() != null && connManager.getActiveNetworkInfo().isConnected()) {
-                    showAlertDialog(Lime.BACKUP, Lime.GOOGLE, getResources().getString(R.string.l3_initial_cloud_backup_confirm));
-                }
-            }
-        });
-
-        btnSetupImRestoreGoogle.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (connManager.getActiveNetworkInfo() != null && connManager.getActiveNetworkInfo().isConnected()) {
-                    showAlertDialog(Lime.RESTORE, Lime.GOOGLE, getResources().getString(R.string.l3_initial_cloud_restore_confirm));
-                }
-            }
-        });
         btnSetupImBackupDropbox.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -375,8 +386,6 @@ public class SetupImFragment extends Fragment {
                         rootView.findViewById(R.id.Setup_Wizard).setVisibility(View.GONE);
                         btnSetupImBackupLocal.setEnabled(true);
                         btnSetupImRestoreLocal.setEnabled(true);
-                        btnSetupImBackupGoogle.setEnabled(true);
-                        btnSetupImRestoreGoogle.setEnabled(true);
                         btnSetupImBackupDropbox.setEnabled(true);
                         btnSetupImRestoreDropbox.setEnabled(true);
                         btnSetupImImportStandard.setEnabled(true);
@@ -397,8 +406,6 @@ public class SetupImFragment extends Fragment {
                             btnSetupImGrantPermission.setVisibility(View.GONE);
                             btnSetupImBackupLocal.setEnabled(true);
                             btnSetupImRestoreLocal.setEnabled(true);
-                            btnSetupImBackupGoogle.setEnabled(true);
-                            btnSetupImRestoreGoogle.setEnabled(true);
                             btnSetupImBackupDropbox.setEnabled(true);
                             btnSetupImRestoreDropbox.setEnabled(true);
                             btnSetupImImportStandard.setEnabled(true);
@@ -408,8 +415,6 @@ public class SetupImFragment extends Fragment {
                             btnSetupImGrantPermission.setVisibility(View.VISIBLE);
                             btnSetupImBackupLocal.setEnabled(false);
                             btnSetupImRestoreLocal.setEnabled(false);
-                            btnSetupImBackupGoogle.setEnabled(false);
-                            btnSetupImRestoreGoogle.setEnabled(false);
                             btnSetupImBackupDropbox.setEnabled(false);
                             btnSetupImRestoreDropbox.setEnabled(false);
                             btnSetupImImportStandard.setEnabled(false);
@@ -707,16 +712,16 @@ public class SetupImFragment extends Fragment {
 
                                 if (type.equalsIgnoreCase(Lime.LOCAL)) {
                                     backupLocalDrive();
-                                } else if (type.equalsIgnoreCase(Lime.GOOGLE)) {
-                                    requestGoogleDrive(Lime.BACKUP);
+                                } else if(type.equalsIgnoreCase(Lime.DROPBOX)){
+                                    requestDropboxDrive(Lime.BACKUP);
                                 }
 
                             } else if (action.equalsIgnoreCase(Lime.RESTORE)) {
 
                                 if (type.equalsIgnoreCase(Lime.LOCAL)) {
                                     restoreLocalDrive();
-                                } else if (type.equalsIgnoreCase(Lime.GOOGLE)) {
-                                    requestGoogleDrive(Lime.RESTORE);
+                                }else if(type.equalsIgnoreCase(Lime.DROPBOX)){
+                                    requestDropboxDrive(Lime.RESTORE);
                                 }
 
                             }
@@ -752,15 +757,26 @@ public class SetupImFragment extends Fragment {
                 showToastMessage(getResources().getString(R.string.payment_service_success), Toast.LENGTH_LONG);
                 //Log.i("LIME", "purchasing complete " + new Date() + " / " + purchaseData);
             }
-        } else if(requestCode == RESTORE_FILE_REQUEST_CODE) {
+        } else if (requestCode == RESTORE_FILE_REQUEST_CODE) {
             Uri uri = data.getData();
-            Log.i(TAG, "Uri : "+uri.toString());
-            restorethread = new Thread(new SetupImRestoreRunnable(this, handler, getFilePathFromUri(uri)));
+            Log.i(TAG, "Uri : " + uri.toString());
+            restorethread = new Thread(new SetupImRestoreRunnable(this, handler, Lime.LOCAL, getFilePathFromUri(uri), null));
             restorethread.start();
-        } else if(requestCode == BACKUP_FILE_REQUEST_CODE) {
+        } else if (requestCode == BACKUP_FILE_REQUEST_CODE) {
             Uri uri = data.getData();
-            if(data != null){
-                backupthread = new Thread(new SetupImBackupRunnable(this, handler, Lime.LOCAL, uri));
+            if (data != null) {
+                backupthread = new Thread(new SetupImBackupRunnable(this, handler, Lime.LOCAL, uri, null));
+                backupthread.start();
+            }
+        } else if (requestCode == RESTORE_DROPBOX_FILE_REQUEST_CODE) {
+            Uri uri = data.getData();
+            Log.i(TAG, "Uri : " + uri.toString());
+            restorethread = new Thread(new SetupImRestoreRunnable(this, handler, Lime.DROPBOX, getFilePathFromUri(uri), mdbapi));
+            restorethread.start();
+        } else if (requestCode == BACKUP_DROPBOX_FILE_REQUEST_CODE) {
+            Uri uri = data.getData();
+            if (data != null) {
+                backupthread = new Thread(new SetupImBackupRunnable(this, handler, Lime.DROPBOX, uri, mdbapi));
                 backupthread.start();
             }
         }
@@ -803,17 +819,40 @@ public class SetupImFragment extends Fragment {
         return filePath;
     }
 
-    public void requestGoogleDrive(String type) {
+    public void requestDropboxDrive(String type){
 
-        if (type != null && type.equals(Lime.BACKUP)) {
-            Intent intent = new Intent().setClass(this.getActivity(), SetupImGoogleActivity.class);
-            intent.putExtra("actiontype", Lime.BACKUP);
-            startActivity(intent);
-        } else {
-            Intent intent = new Intent().setClass(this.getActivity(), SetupImGoogleActivity.class);
-            intent.putExtra("actiontype", Lime.RESTORE);
-            startActivity(intent);
+        mLIMEPref.setParameter(Lime.DROPBOX_TYPE, type);
+        mLIMEPref.setParameter(Lime.DROPBOX_REQUEST_FLAG, true);
+
+        AppKeyPair appKeys = new AppKeyPair(Lime.DROPBOX_APP_KEY, Lime.DROPBOX_APP_SECRET);
+        AndroidAuthSession session = new AndroidAuthSession(appKeys);
+        mdbapi = new DropboxAPI<>(session);
+
+        dropboxAccessToken = mLIMEPref.getParameterString(Lime.DROPBOX_ACCESS_TOKEN, null);
+        if(dropboxAccessToken == null){
+            mdbapi.getSession().startOAuth2Authentication(this.getActivity().getApplicationContext());
+        }else{
+
+            mdbapi = new DropboxAPI<>(new AndroidAuthSession(appKeys, dropboxAccessToken));
+
+            if(mdbapi.getSession().isLinked()){
+                if(type != null && type.equals(Lime.BACKUP)){
+                    backupDropboxDrive();
+                }else if(type != null && type.equals(Lime.RESTORE)){
+                    restoreDropboxDrive();
+                }
+            }else{
+                mdbapi.getSession().startOAuth2Authentication(this.getActivity().getApplicationContext());
+            }
         }
+    }
+
+    public void backupDropboxDrive(){
+        initialThreadTask(Lime.BACKUP, Lime.DROPBOX);
+    }
+
+    public void restoreDropboxDrive(){
+        initialThreadTask(Lime.RESTORE, Lime.DROPBOX);
     }
 
     public void backupLocalDrive() {
@@ -835,32 +874,34 @@ public class SetupImFragment extends Fragment {
             }
 //            backupthread = new Thread(new SetupImBackupRunnable(this, handler, type));
 //            backupthread.start();
-            launchBackupFilePicker();
+            launchBackupFilePicker(type);
         } else if (action.equals(Lime.RESTORE)) {
             if (restorethread != null && restorethread.isAlive()) {
                 handler.removeCallbacks(restorethread);
             }
 //            restorethread = new Thread(new SetupImRestoreRunnable(this, handler, type));
 //            restorethread.start();
-            launchRestoreFilePicker();
+            launchRestoreFilePicker(type);
         }
     }
 
-    final static int BACKUP_FILE_REQUEST_CODE = 10421;
+    final static int BACKUP_FILE_REQUEST_CODE = 271;
+    final static int BACKUP_DROPBOX_FILE_REQUEST_CODE = 272;
 
-    private void launchBackupFilePicker() {
+    private void launchBackupFilePicker(String type) {
         Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT_TREE);
-        startActivityForResult(intent, BACKUP_FILE_REQUEST_CODE);
+        startActivityForResult(intent, Objects.equals(type, Lime.DROPBOX) ? BACKUP_DROPBOX_FILE_REQUEST_CODE : BACKUP_FILE_REQUEST_CODE);
     }
 
     final static int RESTORE_FILE_REQUEST_CODE = 273;
+    final static int RESTORE_DROPBOX_FILE_REQUEST_CODE = 274;
 
-    private void launchRestoreFilePicker() {
+    private void launchRestoreFilePicker(String type) {
         Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
         intent.addCategory(Intent.CATEGORY_OPENABLE);
         intent.setType("application/zip");
 
-        startActivityForResult(intent, RESTORE_FILE_REQUEST_CODE);
+        startActivityForResult(intent, Objects.equals(type, Lime.DROPBOX) ? RESTORE_DROPBOX_FILE_REQUEST_CODE:RESTORE_FILE_REQUEST_CODE);
     }
 
 
