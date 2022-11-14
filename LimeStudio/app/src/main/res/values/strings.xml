@@ -62,8 +62,8 @@
 
     <string name="global_exit_title">離開萊姆設定程式</string>
 
-    <string name="setup_im_backup_message">資料庫備份中，請耐心等候 ...</string>
-    <string name="setup_im_restore_message">資料庫還原中，請耐心等候 ...</string>
+    <string name="setup_im_backup_message">資料庫備份中，請耐心等候 …</string>
+    <string name="setup_im_restore_message">資料庫還原中，請耐心等候 …</string>
     <string name="setup_im_import_complete">資料庫匯入完成</string>
     <string name="setup_im_backup_dropbox">Dropbox 備份</string>
     <string name="setup_im_backup_dropbox_error_507">Dropbox 已沒有足夠的空間進行備份，請檢查</string>
@@ -172,7 +172,7 @@
     <string name="manage_im_search">檢索</string>
     <string name="manage_im_previous">上一頁</string>
     <string name="manage_im_next">下一頁</string>
-    <string name="manage_im_loading">讀取中 ...</string>
+    <string name="manage_im_loading">讀取中 …</string>
     <string name="manage_im_word">文字</string>
     <string name="manage_im_root">字根</string>
 
@@ -188,7 +188,7 @@
     <string name="manage_related_update">更新</string>
     <string name="manage_related_remove">移除</string>
     <string name="manage_related_save">儲存</string>
-    <string name="manage_related_loading">讀取中 ...</string>
+    <string name="manage_related_loading">讀取中 …</string>
     <string name="manage_related_reset">重置</string>
     <string name="manage_related_duplicated">關聯字重覆，無法儲存</string>
     <string name="manage_related_format_error">關聯字建立錯誤，字碼格式不支援</string>
@@ -224,8 +224,8 @@
     <string name="share_dialog_title">分享輸入法</string>
     <string name="share_dialog_title_message">透過分享您可以將輸入法匯出並傳送給你的朋友，目前支援 .lime (文字) 及 limedb (資料庫)，請選擇匯出格式?</string>
 
-    <string name="share_step_initial">準備資料中 ...</string>
-    <string name="share_step_write">寫入暫存檔 ...</string>
+    <string name="share_step_initial">準備資料中 …</string>
+    <string name="share_step_write">寫入暫存檔 …</string>
 
     <string name="share_lime_cin">純文字格式</string>
     <string name="share_lime_db">資料庫檔案</string>

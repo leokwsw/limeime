@@ -29,7 +29,7 @@
         android:icon="@drawable/ic_action_settings"
         android:title="@string/action_preference"
         android:orderInCategory="100"
-        app:showAsAction="always" />
+        app:showAsAction="ifRoom" />
     <!--<item
         android:id="@+id/action_news"
         android:title="@string/action_news"

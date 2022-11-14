@@ -55,11 +55,7 @@ public class Lime {
     public static final String DATABASE_IM_TEMP_EXT = "zip";
 
     // TODO: self hosting
-    public static final String DATABASE_CLOUD_URL_BASED = "https://github.com/lime-ime/limeime/raw/master/Database/";
-
-
-    //public static final String LIME_OLD_VERSION_URL = "https://storage.googleapis.com/google-code-archive-downloads/v2/code.google.com/limeime/LIMEHD_391_334.apk";
-
+    private static final String DATABASE_CLOUD_URL_BASED = "https://github.com/lime-ime/limeime/raw/master/Database/";
 
     public static final String DATABASE_CLOUD_IM_WB = DATABASE_CLOUD_URL_BASED + "wb.zip";
 
@@ -262,12 +258,10 @@ public class Lime {
 
     public static final String DROPBOX = "DROPBOX";
     public static final String DROPBOX_TYPE = "DROPBOX_TYPE";
-    // old dropbox key paris
+
     public final static String DROPBOX_APP_KEY = "cce7qj4dq2jeuef";
     public final static String DROPBOX_APP_SECRET = "c3vbzjc0qobz2aj";
 
-    //public static final String DROPBOX_APP_KEY = "1a85ahrq8uh60r7";
-    //public static final String DROPBOX_APP_SECRET = "l3yyjll7ef3vfb3";
     public static final String DROPBOX_ACCESS_TOKEN = "DROPBOX_ACCESS_TOKEN";
     public static final String DROPBOX_REQUEST_FLAG = "DROPBOX_REQUEST_FLAG";
 

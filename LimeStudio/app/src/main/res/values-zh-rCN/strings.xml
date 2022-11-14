@@ -26,11 +26,6 @@
     <string name="app_name">莱姆输入法</string>
     <string name="app_setting">设定莱姆输入法</string>
 
-    <string name="vpon_banner_id">8a8081824cfe92fa014d3707f493630b</string>
-
-    <string name="ad_unit_interstitial">ca-app-pub-6429718170873338/5892033402</string>
-    <string name="ad_unit_banner">ca-app-pub-6429718170873338/7028669804</string>
-
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
 
@@ -62,8 +57,8 @@
 
     <string name="global_exit_title">离开莱姆设定程式</string>
 
-    <string name="setup_im_backup_message">数据库备份中，请耐心等候 ...</string>
-    <string name="setup_im_restore_message">数据库还原中，请耐心等候 ...</string>
+    <string name="setup_im_backup_message">数据库备份中，请耐心等候 …</string>
+    <string name="setup_im_restore_message">数据库还原中，请耐心等候 …</string>
     <string name="setup_im_import_complete">数据库汇入完成</string>
     <string name="setup_im_backup_dropbox">Dropbox 备份</string>
     <string name="setup_im_backup_dropbox_error_507">Dropbox 已没有足够的空间进行备份，请检查</string>
@@ -170,7 +165,7 @@
     <string name="manage_im_search">检索</string>
     <string name="manage_im_previous">上一页</string>
     <string name="manage_im_next">下一页</string>
-    <string name="manage_im_loading">读取中 ...</string>
+    <string name="manage_im_loading">读取中 …</string>
     <string name="manage_im_word">文字</string>
     <string name="manage_im_root">字根</string>
 
@@ -186,7 +181,7 @@
     <string name="manage_related_update">更新</string>
     <string name="manage_related_remove">移除</string>
     <string name="manage_related_save">储存</string>
-    <string name="manage_related_loading">读取中 ...</string>
+    <string name="manage_related_loading">读取中 …</string>
     <string name="manage_related_reset">重置</string>
     <string name="manage_related_duplicated">关联字重覆，无法储存</string>
     <string name="manage_related_format_error">关联字建立错误，字码格式不支援</string>
@@ -222,8 +217,8 @@
     <string name="share_dialog_title">分享输入法</string>
     <string name="share_dialog_title_message">透过分享您可以将输入法汇出并传送给你的朋友，目前支援 .lime (文字) 及 limedb (数据库)，请选择汇出格式?</string>
 
-    <string name="share_step_initial">准备资料中 ...</string>
-    <string name="share_step_write">写入暂存档 ...</string>
+    <string name="share_step_initial">准备资料中 …</string>
+    <string name="share_step_write">写入暂存档 …</string>
 
     <string name="share_lime_cin">纯文字格式</string>
     <string name="share_lime_db">数据库文档</string>
