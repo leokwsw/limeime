@@ -291,8 +291,8 @@ public class Lime {
     public static final String DROPBOX = "DROPBOX";
     public static final String DROPBOX_TYPE = "DROPBOX_TYPE";
     // old dropbox key paris
-    public final static String DROPBOX_APP_KEY = "keuuzhfc6efjf6t";
-    public final static String DROPBOX_APP_SECRET = "4y8fy4rqk8rofd8";
+    public final static String DROPBOX_APP_KEY = "cce7qj4dq2jeuef";
+    public final static String DROPBOX_APP_SECRET = "c3vbzjc0qobz2aj";
 
     //public static final String DROPBOX_APP_KEY = "1a85ahrq8uh60r7";
     //public static final String DROPBOX_APP_SECRET = "l3yyjll7ef3vfb3";
