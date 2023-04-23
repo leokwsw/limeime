@@ -758,24 +758,28 @@ public class SetupImFragment extends Fragment {
                 //Log.i("LIME", "purchasing complete " + new Date() + " / " + purchaseData);
             }
         } else if (requestCode == RESTORE_FILE_REQUEST_CODE) {
-            Uri uri = data.getData();
-            Log.i(TAG, "Uri : " + uri.toString());
-            restorethread = new Thread(new SetupImRestoreRunnable(this, handler, Lime.LOCAL, getFilePathFromUri(uri), null));
-            restorethread.start();
+            if(data != null && data.getData() != null){
+                Uri uri = data.getData();
+                Log.i(TAG, "Uri : " + uri.toString());
+                restorethread = new Thread(new SetupImRestoreRunnable(this, handler, Lime.LOCAL, getFilePathFromUri(uri), null));
+                restorethread.start();
+            }
         } else if (requestCode == BACKUP_FILE_REQUEST_CODE) {
-            Uri uri = data.getData();
-            if (data != null) {
+            if (data != null && data.getData() != null) {
+                Uri uri = data.getData();
                 backupthread = new Thread(new SetupImBackupRunnable(this, handler, Lime.LOCAL, uri, null));
                 backupthread.start();
             }
         } else if (requestCode == RESTORE_DROPBOX_FILE_REQUEST_CODE) {
-            Uri uri = data.getData();
-            Log.i(TAG, "Uri : " + uri.toString());
-            restorethread = new Thread(new SetupImRestoreRunnable(this, handler, Lime.DROPBOX, getFilePathFromUri(uri), mdbapi));
-            restorethread.start();
+            if (data != null && data.getData() != null) {
+                Uri uri = data.getData();
+                Log.i(TAG, "Uri : " + uri.toString());
+                restorethread = new Thread(new SetupImRestoreRunnable(this, handler, Lime.DROPBOX, getFilePathFromUri(uri), mdbapi));
+                restorethread.start();
+            }
         } else if (requestCode == BACKUP_DROPBOX_FILE_REQUEST_CODE) {
-            Uri uri = data.getData();
-            if (data != null) {
+            if (data != null && data.getData() != null) {
+                Uri uri = data.getData();
                 backupthread = new Thread(new SetupImBackupRunnable(this, handler, Lime.DROPBOX, uri, mdbapi));
                 backupthread.start();
             }
