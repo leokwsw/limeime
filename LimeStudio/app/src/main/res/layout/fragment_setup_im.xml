@@ -23,21 +23,19 @@
   -->
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    xmlns:ads="http://schemas.android.com/apk/res-auto"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical">
+  android:layout_width="match_parent"
+  android:layout_height="match_parent"
+  android:orientation="vertical">
 
     <ScrollView
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        android:id="@+id/scrollView">
+      android:id="@+id/scrollView"
+      android:layout_width="match_parent"
+      android:layout_height="0dp"
+      android:layout_weight="1">
 
-    <LinearLayout
-        android:orientation="vertical"
-        android:layout_width="match_parent"
+        <LinearLayout
+          android:layout_width="match_parent"
+          android:orientation="vertical"
         android:layout_height="wrap_content"
         android:id="@+id/SetupImFragment"
         android:padding="5dp">
@@ -132,17 +130,46 @@
             android:layout_width="fill_parent"
             android:layout_height="fill_parent">
             <Button
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:text="@string/setup_im_grant_permission_button"
-                android:id="@+id/btnSetupImGrantPermission"
-                android:layout_gravity="center_horizontal"
-                android:layout_weight="1"
-                android:padding="5dp"
-                android:layout_marginRight="10dp"
-                android:layout_marginLeft="10dp" />
+              android:id="@+id/btnSetupImGrantPermission"
+              android:layout_width="0dp"
+              android:layout_height="wrap_content"
+              android:layout_gravity="center_horizontal"
+              android:layout_marginLeft="10dp"
+              android:layout_marginRight="10dp"
+              android:layout_weight="1"
+              android:padding="5dp"
+              android:text="@string/setup_im_grant_permission_button" />
         </TableRow>
-    </TableLayout>
+        </TableLayout>
+
+        <TextView
+          android:id="@+id/setup_im_grant_notification_permission"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:layout_marginBottom="5dp"
+          android:text="@string/setup_im_grant_notification_permission"
+          android:textAppearance="?android:attr/textAppearanceMedium" />
+
+        <TableLayout
+          android:layout_width="fill_parent"
+          android:layout_height="fill_parent">
+
+            <TableRow
+              android:layout_width="fill_parent"
+              android:layout_height="fill_parent">
+
+                <Button
+                  android:id="@+id/btnSetupImGrantNotificationPermission"
+                  android:layout_width="0dp"
+                  android:layout_height="wrap_content"
+                  android:layout_gravity="center_horizontal"
+                  android:layout_marginLeft="10dp"
+                  android:layout_marginRight="10dp"
+                  android:layout_weight="1"
+                  android:padding="5dp"
+                  android:text="@string/setup_im_grant_notification_permission_button" />
+            </TableRow>
+        </TableLayout>
     </LinearLayout>
     <LinearLayout
         android:orientation="vertical"

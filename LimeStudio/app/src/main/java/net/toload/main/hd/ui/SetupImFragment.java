@@ -27,7 +27,6 @@ package net.toload.main.hd.ui;
 import android.Manifest;
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.app.DownloadManager;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -38,15 +37,9 @@ import android.database.Cursor;
 import android.graphics.Typeface;
 import android.net.ConnectivityManager;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
-import android.os.Environment;
 import android.os.RemoteException;
-
-import androidx.core.app.ActivityCompat;
-import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentTransaction;
-import androidx.core.content.ContextCompat;
-
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -55,13 +48,17 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.core.content.ContextCompat;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
+
 import com.dropbox.client2.DropboxAPI;
 import com.dropbox.client2.android.AndroidAuthSession;
 import com.dropbox.client2.session.AppKeyPair;
 
 import net.toload.main.hd.DBServer;
 import net.toload.main.hd.Lime;
-import net.toload.main.hd.MainActivity;
 import net.toload.main.hd.R;
 import net.toload.main.hd.data.Im;
 import net.toload.main.hd.global.LIMEPreferenceManager;
@@ -102,6 +99,7 @@ public class SetupImFragment extends Fragment {
     private ProgressDialog progress;
 
     private final int MY_PERMISSIONS_REQUEST_WRITE_EXTERNAL_STORAGE = 0;
+    private final int MY_PERMISSIONS_REQUEST_NOTIFICATION = 1;
     // Google API
     /*private GoogleAccountCredential credential;
     static final int REQUEST_ACCOUNT_PICKER_BACKUP = 1;
@@ -116,6 +114,7 @@ public class SetupImFragment extends Fragment {
     Button btnSetupImSystemSettings;
     Button btnSetupImSystemIMPicker;
     Button btnSetupImGrantPermission;
+    Button btnSetupImGrantNotificationPermission;
 
     // Custom Import
     Button btnSetupImImportStandard;
@@ -291,6 +290,7 @@ public class SetupImFragment extends Fragment {
         btnSetupImSystemSettings = (Button) rootView.findViewById(R.id.btnSetupImSystemSetting);
         btnSetupImSystemIMPicker = (Button) rootView.findViewById(R.id.btnSetupImSystemIMPicker);
         btnSetupImGrantPermission = (Button) rootView.findViewById(R.id.btnSetupImGrantPermission);
+        btnSetupImGrantNotificationPermission = (Button) rootView.findViewById(R.id.btnSetupImGrantNotificationPermission);
         btnSetupImImportStandard = (Button) rootView.findViewById(R.id.btnSetupImImportStandard);
         btnSetupImImportRelated = (Button) rootView.findViewById(R.id.btnSetupImImportRelated);
         btnSetupImPhonetic = (Button) rootView.findViewById(R.id.btnSetupImPhonetic);
@@ -400,8 +400,22 @@ public class SetupImFragment extends Fragment {
                             rootView.findViewById(R.id.setup_im_system_impicker_description).setVisibility(View.VISIBLE);
                         }
                         //Check permission for > API 23
-                        if (ContextCompat.checkSelfPermission(this.getActivity(),
-                                Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
+
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                            if (ContextCompat.checkSelfPermission(this.getActivity(), Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED) {
+                                rootView.findViewById(R.id.setup_im_grant_notification_permission).setVisibility((View.GONE));
+                                btnSetupImGrantNotificationPermission.setVisibility(View.GONE);
+                            } else {
+                                rootView.findViewById(R.id.setup_im_grant_notification_permission).setVisibility((View.VISIBLE));
+                                btnSetupImGrantNotificationPermission.setVisibility(View.VISIBLE);
+                            }
+                        } else {
+                            rootView.findViewById(R.id.setup_im_grant_notification_permission).setVisibility((View.GONE));
+                            btnSetupImGrantNotificationPermission.setVisibility(View.GONE);
+                        }
+
+                        if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU || ContextCompat.checkSelfPermission(this.getActivity(),
+                            Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
                             rootView.findViewById(R.id.setup_im_grant_permission).setVisibility((View.GONE));
                             btnSetupImGrantPermission.setVisibility(View.GONE);
                             btnSetupImBackupLocal.setEnabled(true);
@@ -436,9 +450,21 @@ public class SetupImFragment extends Fragment {
                 btnSetupImGrantPermission.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        ActivityCompat.requestPermissions(getActivity(),
-                                new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
-                                MY_PERMISSIONS_REQUEST_WRITE_EXTERNAL_STORAGE);
+                        requestPermissions(
+                            new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
+                            MY_PERMISSIONS_REQUEST_WRITE_EXTERNAL_STORAGE
+                        );
+                    }
+                });
+                btnSetupImGrantNotificationPermission.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                            requestPermissions(
+                                new String[]{Manifest.permission.POST_NOTIFICATIONS},
+                                MY_PERMISSIONS_REQUEST_NOTIFICATION
+                            );
+                        }
                     }
                 });
                 btnSetupImSystemSettings.setOnClickListener(new View.OnClickListener() {
